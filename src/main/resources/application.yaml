@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: music-mgmt-collection-library
+eureka:
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+  server:
+    wait-time-in-ms-when-sync-empty: 0
