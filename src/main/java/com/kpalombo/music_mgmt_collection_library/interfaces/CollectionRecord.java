@@ -3,10 +3,16 @@ package com.kpalombo.music_mgmt_collection_library.interfaces;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import lombok.Getter;
+import lombok.Setter;
 
-public interface CollectionRecord {
+import java.util.UUID;
+
+
+@Getter
+@Setter
+public class CollectionRecord {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long getId();
-    void setId(Long id);
+    private UUID id;
 }

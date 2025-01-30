@@ -1,5 +1,6 @@
 package com.kpalombo.music_mgmt_collection_library.interfaces;
 
+import jakarta.validation.Valid;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -8,18 +9,19 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @Data
-public abstract class CollectionController<T, Long> {
+public abstract class CollectionController<T extends CollectionRecord, E extends UUID> {
     @Autowired
-    public JpaRepository<T, Long> repository;
+    public JpaRepository<T, UUID> repository;
 
-    protected CollectionController(JpaRepository<T, Long> repository) {
+    protected CollectionController(JpaRepository<T, UUID> repository) {
         this.repository = repository;
     }
 
     @PostMapping("/create")
-    public Response<T> create(@RequestBody Request<T> request) {
+    public Response<T> create(@RequestBody @Valid Request<T> request) {
         Response<T> response = new Response<>();
         T record = request.getRecord();
         T createdRecord = repository.save(record);
@@ -35,28 +37,28 @@ public abstract class CollectionController<T, Long> {
         return response;
     }
 
-    @GetMapping("/{id}")
-    public Response<T> get(@RequestBody Request<T> request) {
+    @GetMapping("/record")
+    public Response<T> get(@RequestParam String id) {
         Response<T> response = new Response<>();
-        T record = repository.findById((Long) request.getId()).orElse(null);
+        T record = repository.findById(UUID.fromString(id)).orElse(null);
         response.setResponse(new ResponseEntity<>(record, HttpStatus.OK));
         return response;
     }
 
-    @PutMapping("/{id}")
-    public Response<T> update(@RequestBody Request<T> request) {
+    @PutMapping("/record")
+    public Response<T> update(@RequestParam String id, @RequestBody @Valid Request<T> request) {
         Response<T> response = new Response<>();
-        T record = repository.findById((Long) request.getId()).orElse(null);
-        T updatedRecord = repository.save(record);
+        T updatedRecord = request.getRecord();
+        updatedRecord.setId(UUID.fromString(id));
+        repository.save(updatedRecord);
         response.setResponse(new ResponseEntity<>(updatedRecord, HttpStatus.OK));
         return response;
     }
 
-    @DeleteMapping("/{id}")
-    public Response<T> delete(@RequestBody Request<T> request) {
+    @DeleteMapping("/record")
+    public Response<T> delete(@RequestParam String id) {
         Response<T> response = new Response<>();
-        String id = request.getId();
-        T record = repository.findById((Long) request.getId()).orElse(null);
+        T record = repository.findById(UUID.fromString(id)).orElse(null);
         repository.delete(record);
         response.setResponse(new ResponseEntity<>(HttpStatus.NO_CONTENT));
         return response;
