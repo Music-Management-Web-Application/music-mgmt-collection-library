@@ -48,9 +48,9 @@ public abstract class CollectionController<T extends CollectionRecord, E extends
     @PutMapping("/record")
     public Response<T> update(@RequestParam String id, @RequestBody @Valid Request<T> request) {
         Response<T> response = new Response<>();
-        T updatedRecord = request.getRecord();
-        updatedRecord.setId(UUID.fromString(id));
-        repository.save(updatedRecord);
+        T record = request.getRecord();
+        record.setId(UUID.fromString(id));
+        T updatedRecord = repository.save(record);
         response.setResponse(new ResponseEntity<>(updatedRecord, HttpStatus.OK));
         return response;
     }
