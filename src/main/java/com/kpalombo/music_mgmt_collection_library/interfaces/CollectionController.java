@@ -37,7 +37,7 @@ public abstract class CollectionController<T extends CollectionRecord, E extends
         return response;
     }
 
-    @GetMapping("/record")
+    @GetMapping("/get")
     public Response<T> get(@RequestParam String id) {
         Response<T> response = new Response<>();
         T record = repository.findById(UUID.fromString(id)).orElse(null);
@@ -45,7 +45,7 @@ public abstract class CollectionController<T extends CollectionRecord, E extends
         return response;
     }
 
-    @PutMapping("/record")
+    @PutMapping("/update")
     public Response<T> update(@RequestParam String id, @RequestBody @Valid Request<T> request) {
         Response<T> response = new Response<>();
         T record = request.getRecord();
@@ -55,12 +55,16 @@ public abstract class CollectionController<T extends CollectionRecord, E extends
         return response;
     }
 
-    @DeleteMapping("/record")
+    @DeleteMapping("/delete")
     public Response<T> delete(@RequestParam String id) {
         Response<T> response = new Response<>();
         T record = repository.findById(UUID.fromString(id)).orElse(null);
-        repository.delete(record);
-        response.setResponse(new ResponseEntity<>(HttpStatus.NO_CONTENT));
+        if (record == null) {
+            response.setResponse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        } else {
+            repository.delete(record);
+            response.setResponse(new ResponseEntity<>(HttpStatus.NO_CONTENT));
+        }
         return response;
     }
 }
